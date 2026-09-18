@@ -5,6 +5,9 @@ metadata:
   name: nginx
   namespace: default
 
+labels:
+  app: nginx
+
 status:
   phase: Running
 

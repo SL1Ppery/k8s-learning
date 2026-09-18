@@ -3,6 +3,7 @@ package client
 import (
 	"fmt"
 	fakecluster "k8s-learning/fakeCluster"
+	nameGenerator "k8s-learning/nameGenerator"
 	"k8s-learning/resource"
 )
 
@@ -57,3 +58,58 @@ func (fc *FakeClient) UpdateDeployment(dep *resource.Deployment) error {
 	}
 	return fmt.Errorf("deployment not found")
 }
+
+func (fc *FakeClient) GetPodsByLabels(labels map[string]string) (*[]resource.Pod, error) {
+	var matchedPods []resource.Pod
+	fakeClusterPods := fakecluster.GetFakeClusterPods()
+	for i := range fakeClusterPods {
+		match := true
+		for k, v := range labels {
+			if fakeClusterPods[i].Metadata.Labels[k] != v {
+				match = false
+				break
+			}
+		}
+		if match {
+			matchedPods = append(matchedPods, fakeClusterPods[i])
+		}
+	}
+	return &matchedPods, nil
+}
+
+func (fc *FakeClient) CreatePodWithTemplate(template *resource.PodTemplate, name string) error {
+	var newPod resource.Pod
+	newPod.Metadata = template.Metadata
+	newPod.Metadata.Name = nameGenerator.GenerateName(name)
+	fakecluster.Cluster.Pods = append(fakecluster.Cluster.Pods, newPod)
+	if fakecluster.Cluster.Pods[len(fakecluster.Cluster.Pods)-1].Metadata.Name == newPod.Metadata.Name {
+		return nil
+	} else {
+		return fmt.Errorf("failed to create pod with template")
+	}
+}
+
+// func (fc *FakeClient) GetReplicaSet(name string) (*resource.ReplicaSet, error) {
+// 	fakeClusterReplicaSets := fakecluster.GetFakeClusterReplicaSets()
+// 	for i := range fakeClusterReplicaSets {
+// 		if fakeClusterReplicaSets[i].Metadata.Name == name {
+// 			return &fakeClusterReplicaSets[i], nil
+// 		}
+// 	}
+// 	return nil, fmt.Errorf("replica set not found")
+// }
+
+// func (fc *FakeClient) CreateReplicaSet(rs *resource.ReplicaSet) error {
+// 	fakecluster.Cluster.ReplicaSets = append(fakecluster.Cluster.ReplicaSets, *rs)
+// 	return nil
+// }
+
+// func (fc *FakeClient) UpdateReplicaSet(rs *resource.ReplicaSet) error {
+// 	for i, r := range fakecluster.Cluster.ReplicaSets {
+// 		if r.Metadata.Name == rs.Metadata.Name {
+// 			fakecluster.Cluster.ReplicaSets[i] = *rs
+// 			return nil
+// 		}
+// 	}
+// 	return fmt.Errorf("replica set not found")
+// }

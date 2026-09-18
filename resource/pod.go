@@ -12,8 +12,9 @@ type Pod struct {
 	Status     Status   `json:"status"`
 }
 type Metadata struct {
-	Name      string `json:"name"`
-	Namespace string `json:"namespace"`
+	Name      string            `json:"name"`
+	Namespace string            `json:"namespace"`
+	Labels    map[string]string `json:"labels"`
 }
 type Status struct {
 	Phase string `json:"phase"`

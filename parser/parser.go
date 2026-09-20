@@ -28,6 +28,9 @@ func Parser(filename string, registry *factory.Registry) []k8sinterface.Resource
 		if !ok {
 			continue
 		}
+		if kind == "ReplicaSet" {
+			normalizeReplicaSetSelector(raw)
+		}
 		obj := registry.Create(kind)
 		if obj == nil {
 			fmt.Printf("不支持的资源类型:%s\n", kind)
@@ -45,4 +48,14 @@ func Parser(filename string, registry *factory.Registry) []k8sinterface.Resource
 		resources = append(resources, obj)
 	}
 	return resources
+}
+
+func normalizeReplicaSetSelector(raw map[string]interface{}) {
+	selector, ok := raw["selector"].(map[string]interface{})
+	if !ok {
+		return
+	}
+	if matchLabels, ok := selector["matchLabels"].(map[string]interface{}); ok {
+		raw["selector"] = matchLabels
+	}
 }

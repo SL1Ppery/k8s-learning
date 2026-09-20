@@ -10,7 +10,7 @@ type FakeCluster struct {
 
 var Cluster = FakeCluster{
 	Pods: []resource.Pod{
-		{APIVersion: "v1", Kind: "Pod", Metadata: resource.Metadata{Name: "nginx", Namespace: "default", Labels: map[string]string{"app": "nginx"}}, Status: resource.Status{Phase: "Running"}},
+		{APIVersion: "v1", Kind: "Pod", Metadata: resource.Metadata{Name: "nginx-replicaset-feu24", Namespace: "default", Labels: map[string]string{"app": "nginx"}}, Status: resource.Status{Phase: "Running"}},
 		{APIVersion: "v1", Kind: "Pod", Metadata: resource.Metadata{Name: "mysql", Namespace: "default", Labels: map[string]string{"app": "mysql"}}, Status: resource.Status{Phase: "Pending"}},
 	},
 	Deployments: []resource.Deployment{

@@ -30,7 +30,7 @@ func (pod *Pod) GetName() string {
 }
 
 func (pod *Pod) GetInfo() {
-	fmt.Printf("%-20s %-20s %-20s\n", pod.Metadata.Name, pod.Metadata.Namespace, pod.Status.Phase)
+	fmt.Printf("%-40s %-40s %-40s\n", pod.Metadata.Name, pod.Metadata.Namespace, pod.Status.Phase)
 }
 func NewPod() k8sinterface.Resource {
 	return &Pod{}

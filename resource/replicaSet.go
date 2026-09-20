@@ -1,6 +1,9 @@
 package resource
 
-import "fmt"
+import (
+	"fmt"
+	"k8s-learning/k8sinterface"
+)
 
 type ReplicaSet struct {
 	APIVersion string            `json:"apiVersion"`
@@ -9,10 +12,16 @@ type ReplicaSet struct {
 	Replicas   int               `json:"replicas"`
 	Selector   map[string]string `json:"selector"`
 	Template   PodTemplate       `json:"template"`
+	Status     Status            `json:"status"`
 }
 
 type PodTemplate struct {
 	Metadata Metadata `json:"metadata"`
+}
+
+type ReplicaSetStatus struct {
+	Replicas      int
+	ReadyReplicas int
 }
 
 type ReplicaSets []ReplicaSet
@@ -24,8 +33,8 @@ func (rs *ReplicaSet) GetName() string {
 	return rs.Metadata.Name
 }
 func (rs *ReplicaSet) GetInfo() {
-	fmt.Printf("%-20s %-20s %-20d\n", rs.Metadata.Name, rs.Metadata.Namespace, rs.Replicas)
+	fmt.Printf("%-40s %-40s %-40d\n", rs.Metadata.Name, rs.Metadata.Namespace, rs.Replicas)
 }
-func NewReplicaSet() *ReplicaSet {
+func NewReplicaSet() k8sinterface.Resource {
 	return &ReplicaSet{}
 }

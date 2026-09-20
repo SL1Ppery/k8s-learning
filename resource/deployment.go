@@ -20,7 +20,7 @@ func (dep *Deployment) GetName() string {
 	return dep.Metadata.Name
 }
 func (dep *Deployment) GetInfo() {
-	fmt.Printf("%-20s %-20s %-20d\n", dep.Metadata.Name, dep.Metadata.Namespace, dep.Replicas)
+	fmt.Printf("%-40s %-40s %-40d\n", dep.Metadata.Name, dep.Metadata.Namespace, dep.Replicas)
 }
 
 func NewDeployment() k8sinterface.Resource {

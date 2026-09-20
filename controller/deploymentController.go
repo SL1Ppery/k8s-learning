@@ -22,6 +22,7 @@ func (dc *DeploymentController) Reconcile(desireddep *resource.Deployment) {
 		dc.Client.CreateDeployment(desireddep)
 		return
 	}
+	fmt.Printf("%-40s %-40s %-40s\n", "Deployment/Name", "Namespace", "Replicas")
 	currentDep.GetInfo()
 
 	if desireddep.Replicas != currentDep.Replicas {

@@ -79,37 +79,39 @@ func (fc *FakeClient) GetPodsByLabels(labels map[string]string) (*[]resource.Pod
 
 func (fc *FakeClient) CreatePodWithTemplate(template *resource.PodTemplate, name string) error {
 	var newPod resource.Pod
+	newPod.APIVersion = "v1"
+	newPod.Kind = "Pod"
 	newPod.Metadata = template.Metadata
 	newPod.Metadata.Name = nameGenerator.GenerateName(name)
+	newPod.Metadata.Labels = template.Metadata.Labels
+	newPod.Metadata.Namespace = template.Metadata.Namespace
+	newPod.Status = resource.Status{Phase: "Pending"}
+
 	fakecluster.Cluster.Pods = append(fakecluster.Cluster.Pods, newPod)
-	if fakecluster.Cluster.Pods[len(fakecluster.Cluster.Pods)-1].Metadata.Name == newPod.Metadata.Name {
-		return nil
-	} else {
-		return fmt.Errorf("failed to create pod with template")
-	}
+	return nil
 }
 
-// func (fc *FakeClient) GetReplicaSet(name string) (*resource.ReplicaSet, error) {
-// 	fakeClusterReplicaSets := fakecluster.GetFakeClusterReplicaSets()
-// 	for i := range fakeClusterReplicaSets {
-// 		if fakeClusterReplicaSets[i].Metadata.Name == name {
-// 			return &fakeClusterReplicaSets[i], nil
-// 		}
-// 	}
-// 	return nil, fmt.Errorf("replica set not found")
-// }
+func (fc *FakeClient) GetReplicaSet(name string) (*resource.ReplicaSet, error) {
+	fakeClusterReplicaSets := fakecluster.GetFakeClusterReplicaSets()
+	for i := range fakeClusterReplicaSets {
+		if fakeClusterReplicaSets[i].Metadata.Name == name {
+			return &fakeClusterReplicaSets[i], nil
+		}
+	}
+	return nil, fmt.Errorf("replica set not found")
+}
 
-// func (fc *FakeClient) CreateReplicaSet(rs *resource.ReplicaSet) error {
-// 	fakecluster.Cluster.ReplicaSets = append(fakecluster.Cluster.ReplicaSets, *rs)
-// 	return nil
-// }
+func (fc *FakeClient) CreateReplicaSet(rs *resource.ReplicaSet) error {
+	fakecluster.Cluster.ReplicaSets = append(fakecluster.Cluster.ReplicaSets, *rs)
+	return nil
+}
 
-// func (fc *FakeClient) UpdateReplicaSet(rs *resource.ReplicaSet) error {
-// 	for i, r := range fakecluster.Cluster.ReplicaSets {
-// 		if r.Metadata.Name == rs.Metadata.Name {
-// 			fakecluster.Cluster.ReplicaSets[i] = *rs
-// 			return nil
-// 		}
-// 	}
-// 	return fmt.Errorf("replica set not found")
-// }
+func (fc *FakeClient) UpdateReplicaSet(rs *resource.ReplicaSet) error {
+	for i, r := range fakecluster.Cluster.ReplicaSets {
+		if r.Metadata.Name == rs.Metadata.Name {
+			fakecluster.Cluster.ReplicaSets[i] = *rs
+			return nil
+		}
+	}
+	return fmt.Errorf("replica set not found")
+}

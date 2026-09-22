@@ -19,6 +19,9 @@ func (dep *Deployment) GetKind() string {
 func (dep *Deployment) GetName() string {
 	return dep.Metadata.Name
 }
+func (dep *Deployment) GetNamespace() string {
+	return dep.Metadata.Namespace
+}
 func (dep *Deployment) GetInfo() {
 	fmt.Printf("%-40s %-40s %-40d\n", dep.Metadata.Name, dep.Metadata.Namespace, dep.Replicas)
 }

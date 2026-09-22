@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	fakecluster "k8s-learning/fakeCluster"
 	"k8s-learning/k8sinterface"
 )
 
@@ -19,11 +20,12 @@ func (cm *ControllerManager) Registry(kind string, controller k8sinterface.Contr
 	cm.Controllers[kind] = controller
 }
 
-func (cm *ControllerManager) Handle(r k8sinterface.Resource) {
-	controller, ok := cm.Controllers[r.GetKind()]
+func (cm *ControllerManager) Handle(key string) {
+	rescource := fakecluster.GetResourceByMetadata(key)
+	controller, ok := cm.Controllers[rescource.GetName()]
 	if !ok {
-		fmt.Printf("没有对应的controller%v\n", r.GetKind())
+		fmt.Printf("没有%s控制器", rescource.GetKind())
 		return
 	}
-	controller.Handle(r)
+	controller.Handle(rescource)
 }

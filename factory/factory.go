@@ -25,3 +25,11 @@ func (r *Registry) Create(kind string) k8sinterface.Resource {
 	}
 	return creator()
 }
+
+func (r *Registry) GetKind(kind string) bool {
+	_, ok := r.creators[kind]
+	if !ok {
+		return false
+	}
+	return true
+}

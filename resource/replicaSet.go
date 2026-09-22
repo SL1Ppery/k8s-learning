@@ -32,6 +32,9 @@ func (rs *ReplicaSet) GetKind() string {
 func (rs *ReplicaSet) GetName() string {
 	return rs.Metadata.Name
 }
+func (rs *ReplicaSet) GetNamespace() string {
+	return rs.Metadata.Namespace
+}
 func (rs *ReplicaSet) GetInfo() {
 	fmt.Printf("%-40s %-40s %-40d\n", rs.Metadata.Name, rs.Metadata.Namespace, rs.Replicas)
 }

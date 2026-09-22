@@ -23,6 +23,15 @@ replicas: 3
 
 ---
 apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: ruoyi
+  namespace: prod
+
+replicas: 1
+---
+apiVersion: apps/v1
 kind: ReplicaSet
 
 metadata:

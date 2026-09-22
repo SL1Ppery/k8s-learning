@@ -29,6 +29,9 @@ func (pod *Pod) GetName() string {
 	return pod.Metadata.Name
 }
 
+func (pod *Pod) GetNamespace() string {
+	return pod.Metadata.Namespace
+}
 func (pod *Pod) GetInfo() {
 	fmt.Printf("%-40s %-40s %-40s\n", pod.Metadata.Name, pod.Metadata.Namespace, pod.Status.Phase)
 }

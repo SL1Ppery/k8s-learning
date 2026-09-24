@@ -2,13 +2,13 @@ package controller
 
 import (
 	"fmt"
-	"k8s-learning/client"
+	"k8s-learning/fakeapi"
 	"k8s-learning/k8sinterface"
 	"k8s-learning/resource"
 )
 
 type PodController struct {
-	Client client.Client
+	FakeAPIServer *fakeapi.FakeAPIServer
 }
 
 func (pc *PodController) Handle(r k8sinterface.Resource) {
@@ -16,24 +16,27 @@ func (pc *PodController) Handle(r k8sinterface.Resource) {
 	pc.Reconcile(pod)
 }
 
-func (pc *PodController) Reconcile(desiredpod *resource.Pod) {
-	currentPod, err := pc.Client.GetPod(desiredpod.Metadata.Name)
+func (pc *PodController) Reconcile(desiredpod *resource.Pod) error {
+	currentPod, err := pc.FakeAPIServer.Get(desiredpod.Kind, desiredpod.Metadata.Namespace, desiredpod.Metadata.Name)
 	if err != nil {
-		pc.Client.CreatePod(desiredpod)
+		pc.FakeAPIServer.Create(desiredpod)
 		fmt.Printf("pod %s 已创建\n", desiredpod.Metadata.Name)
-		return
+		return nil
 	}
-	currentPod.GetInfo()
-	if desiredpod.Status.Phase != currentPod.Status.Phase {
-		fmt.Printf("Pod: %s 当前状态与期望值不符,当前：%s 期望：%s", desiredpod.Metadata.Name, currentPod.Status.Phase, desiredpod.Status.Phase)
+	pod, ok := currentPod.(*resource.Pod)
+	if !ok {
+		return fmt.Errorf("resource type mismatch: expected Pod")
 	}
-	currentPod.Status.Phase = desiredpod.Status.Phase
-	err = pc.Client.UpdatePod(currentPod)
+	pod.GetInfo()
+	if desiredpod.Status.Phase != pod.Status.Phase {
+		fmt.Printf("Pod: %s 当前状态与期望值不符,当前：%s 期望：%s", desiredpod.Metadata.Name, pod.Status.Phase, desiredpod.Status.Phase)
+	}
+	pod.Status.Phase = desiredpod.Status.Phase
+	err = pc.FakeAPIServer.Update(pod)
 	if err != nil {
-		fmt.Printf("更新pod状态失败: %v\n", err)
-		return
+		return fmt.Errorf("更新pod状态失败: %v\n", err)
 	} else {
 		fmt.Printf("pod:%s 状态已更新\n", desiredpod.Metadata.Name)
+		return nil
 	}
-
 }

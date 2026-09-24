@@ -2,13 +2,13 @@ package controller
 
 import (
 	"fmt"
-	"k8s-learning/client"
+	"k8s-learning/fakeapi"
 	"k8s-learning/k8sinterface"
 	"k8s-learning/resource"
 )
 
 type ReplicaSetController struct {
-	Client client.Client
+	FakeAPIServer *fakeapi.FakeAPIServer
 }
 
 func (rsc *ReplicaSetController) Handle(r k8sinterface.Resource) {
@@ -16,7 +16,7 @@ func (rsc *ReplicaSetController) Handle(r k8sinterface.Resource) {
 	rsc.Reconcile(rs)
 }
 func (rsc *ReplicaSetController) Reconcile(desiredrs *resource.ReplicaSet) {
-	pods, err := rsc.Client.GetPodsByLabels(desiredrs.Selector)
+	pods, err := rsc.FakeAPIServer.GetPodsByLabels(desiredrs.Template.Metadata.Labels)
 	if err != nil {
 		fmt.Printf("查询 ReplicaSet %s 的 Pod 失败: %v\n", desiredrs.Metadata.Name, err)
 		return
@@ -26,7 +26,7 @@ func (rsc *ReplicaSetController) Reconcile(desiredrs *resource.ReplicaSet) {
 	if currentcount < desiredrs.Replicas {
 		needCreate := desiredrs.Replicas - currentcount
 		for i := 0; i < needCreate; i++ {
-			err := rsc.Client.CreatePodWithTemplate(&desiredrs.Template, desiredrs.Metadata.Name)
+			err := rsc.FakeAPIServer.CreatePodWithTemplate(&desiredrs.Template, desiredrs.Metadata.Name)
 			if err != nil {
 				fmt.Printf("ReplicaSet %s 创建 Pod 失败: %v\n", desiredrs.Metadata.Name, err)
 				return
@@ -46,7 +46,7 @@ func (rsc *ReplicaSetController) Reconcile(desiredrs *resource.ReplicaSet) {
 }
 
 func (rsc *ReplicaSetController) printAdjustedPods(desiredrs *resource.ReplicaSet) {
-	pods, err := rsc.Client.GetPodsByLabels(desiredrs.Selector)
+	pods, err := rsc.FakeAPIServer.GetPodsByLabels(desiredrs.Selector)
 	if err != nil {
 		fmt.Printf("查询 ReplicaSet %s 调整后的 Pod 失败: %v\n", desiredrs.Metadata.Name, err)
 		return

@@ -20,12 +20,19 @@ func (cm *ControllerManager) Registry(kind string, controller k8sinterface.Contr
 	cm.Controllers[kind] = controller
 }
 
-func (cm *ControllerManager) Handle(key string) {
-	rescource := fakecluster.GetResourceByMetadata(key)
-	controller, ok := cm.Controllers[rescource.GetName()]
-	if !ok {
-		fmt.Printf("没有%s控制器", rescource.GetKind())
+func (cm *ControllerManager) Handle(fakecluster *fakecluster.FakeCluster, key string) {
+	resource := fakecluster.GetResourceByMetadata(key)
+
+	if resource == nil {
+		fmt.Println("资源不存在:", key)
 		return
 	}
-	controller.Handle(rescource)
+
+	controller, ok := cm.Controllers[resource.GetKind()]
+	if !ok {
+		fmt.Printf("没有%s控制器\n", resource.GetKind())
+		return
+	}
+
+	controller.Handle(resource)
 }
